@@ -363,7 +363,7 @@ void Arduino_ST7789::drawBitmapLine( int16_t x, int16_t y, int16_t w,
   DC_HIGH();
   CS_LOW();
     
-  _SPI.writeBytes( ( uint8_t* )bmp, ByteCnt );
+  SPI.writeBytes( ( uint8_t* )bmp, ByteCnt );
 
   CS_HIGH();
   SPI_END_TRANSACTION();
