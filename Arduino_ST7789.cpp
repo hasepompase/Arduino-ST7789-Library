@@ -351,19 +351,26 @@ void Arduino_ST7789::pushColor(uint16_t color) {
 }
 
 void Arduino_ST7789::drawBitmapLine( int16_t x, int16_t y, int16_t w, 
-  const uint16_t* bmp  ) {
+  uint16_t* bmp  ) {
   if((x < 0) || (w < 1) || (x + w > _width) ||
      (y < 0) || (y > _height)) return;
-    
-  setAddrWindow(x,y,x+w-1,y);   
-       
-  const uint16_t ByteCnt = w * 2;
-    
+
+  setAddrWindow(x,y,x+w-1,y);
+
+  const uint32_t ByteCnt = w * 2;
+  uint8_t* bmp8 = ( uint8_t* )bmp;
+
   SPI_BEGIN_TRANSACTION();
   DC_HIGH();
   CS_LOW();
-    
-  SPI.writeBytes( ( uint8_t* )bmp, ByteCnt );
+
+#if defined (SPI_HAS_TRANSACTION)
+  SPI.transfer( bmp8, ByteCnt );
+#else
+  for( uint16_t b = 0; b < ByteCnt; b++ ) {
+    spiwrite( bmp8[b] );
+  }
+#endif
 
   CS_HIGH();
   SPI_END_TRANSACTION();
